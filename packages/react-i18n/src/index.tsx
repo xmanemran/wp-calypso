@@ -26,7 +26,9 @@ export const I18nProvider: React.FunctionComponent< Props > = ( {
 	locale = 'en',
 	localeData,
 } ) => {
-	const makeStableContext = React.useRef< typeof makeContextValue >( memize( makeContextValue ) );
+	const makeStableContext = React.useRef< typeof makeContextValue >(
+		memize( makeContextValue, { maxSize: 1 } )
+	);
 	return (
 		<I18nContext.Provider value={ makeStableContext.current( locale, localeData ) }>
 			{ children }
