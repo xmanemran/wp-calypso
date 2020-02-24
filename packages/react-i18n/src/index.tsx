@@ -2,7 +2,8 @@
  * External dependencies
  */
 import * as React from 'react';
-import { I18n } from './i18n-locale';
+import memize from 'memize';
+import { I18n, LocaleData } from './i18n-locale';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 export interface I18nReact {
@@ -14,10 +15,7 @@ export interface I18nReact {
 }
 
 const DEFAULT_LOCALE = 'en';
-const DEFAULT_I18N = new I18n();
-const I18nContext = React.createContext< I18nReact >(
-	makeContextValue( DEFAULT_LOCALE, DEFAULT_I18N )
-);
+const I18nContext = React.createContext< I18nReact >( makeContextValue( DEFAULT_LOCALE, {} ) );
 
 interface Props {
 	locale?: string;
@@ -28,21 +26,12 @@ export const I18nProvider: React.FunctionComponent< Props > = ( {
 	locale = 'en',
 	localeData,
 } ) => {
-	const lastLocale = React.useRef( locale );
-	const i18n = React.useRef< I18n >( new I18n( localeData ) );
-	const contextValue = React.useRef< I18nReact >( makeContextValue( locale, i18n.current ) );
-	React.useEffect( () => {
-		if ( locale !== lastLocale.current ) {
-			// If locale updates, create a new i18n instance
-			i18n.current = new I18n( localeData );
-			lastLocale.current = locale;
-		} else {
-			// If locale hasn't updated, call setLocaleData to merge in data
-			i18n.current.setLocaleData( localeData );
-		}
-		contextValue.current = makeContextValue( locale, i18n.current );
-	}, [ locale, localeData ] );
-	return <I18nContext.Provider value={ contextValue.current }>{ children }</I18nContext.Provider>;
+	const makeStableContext = memize( makeContextValue );
+	return (
+		<I18nContext.Provider value={ makeStableContext( locale, localeData ) }>
+			{ children }
+		</I18nContext.Provider>
+	);
 };
 
 /**
@@ -87,11 +76,12 @@ export const withI18n = createHigherOrderComponent< I18nReact >( InnerComponent 
  * Utility to make a new context value
  *
  * @param locale The locale of the context value
- * @param i18n The I18n instance for translation functions
+ * @param localeData The localeData
  *
  * @returns The context value with bound translation functions
  */
-function makeContextValue( locale: string, i18n: I18n ): I18nReact {
+function makeContextValue( locale: string, localeData: LocaleData ): I18nReact {
+	const i18n = new I18n( localeData );
 	return {
 		i18nlocale: locale,
 		__: i18n.__.bind( i18n ),
