@@ -2,38 +2,48 @@
  * External dependencies
  */
 import * as React from 'react';
-import { __, _n, _nx, _x } from '@wordpress/i18n';
+import { I18n } from './i18n-locale';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
-const DEFAULT_LOCALE = 'en';
-
-export interface I18nProps {
-	__: typeof __;
-	_n: typeof _n;
-	_nx: typeof _nx;
-	_x: typeof _x;
-	i18nLocale: string;
+export interface I18nReact {
+	i18nlocale: string;
+	__: I18n[ '__' ];
+	_n: I18n[ '_n' ];
+	_nx: I18n[ '_nx' ];
+	_x: I18n[ '_x' ];
 }
 
-const I18nContext = React.createContext< I18nProps >( makeI18n( DEFAULT_LOCALE ) );
+const DEFAULT_LOCALE = 'en';
+const DEFAULT_I18N = new I18n();
+const I18nContext = React.createContext< I18nReact >(
+	makeContextValue( DEFAULT_LOCALE, DEFAULT_I18N )
+);
 
 interface Props {
-	/**
-	 * The current locale
-	 */
-	locale: string;
+	locale?: string;
+	localeData?: { [ key: string ]: string[] };
 }
-export const I18nProvider: React.FunctionComponent< Props > = ( { children, locale } ) => {
-	const [ contextValue, setContextValue ] = React.useState< I18nProps >( makeI18n( locale ) );
+export const I18nProvider: React.FunctionComponent< Props > = ( {
+	children,
+	locale = 'en',
+	localeData,
+} ) => {
+	const lastLocale = React.useRef( locale );
+	const i18n = React.useRef< I18n >( new I18n( localeData ) );
+	const contextValue = React.useRef< I18nReact >( makeContextValue( locale, i18n.current ) );
 	React.useEffect( () => {
-		setContextValue( makeI18n( locale ) );
-	}, [ locale ] );
-	return <I18nContext.Provider value={ contextValue }>{ children }</I18nContext.Provider>;
+		if ( locale !== lastLocale.current ) {
+			// If locale updates, create a new i18n instance
+			i18n.current = new I18n( localeData );
+			lastLocale.current = locale;
+		} else {
+			// If locale hasn't updated, call setLocaleData to merge in data
+			i18n.current.setLocaleData( localeData );
+		}
+		contextValue.current = makeContextValue( locale, i18n.current );
+	}, [ locale, localeData ] );
+	return <I18nContext.Provider value={ contextValue.current }>{ children }</I18nContext.Provider>;
 };
-
-function makeI18n( i18nLocale: string ) {
-	return { __, _n, _nx, _x, i18nLocale };
-}
 
 /**
  * React hook providing i18n translate functions
@@ -46,10 +56,10 @@ function makeI18n( i18nLocale: string ) {
  *   return <div>{ __( 'Translate me.', 'text-domain' ) }</div>;
  * }
  */
-export const useI18n = (): I18nProps => {
-	const i18n = React.useContext( I18nContext );
-	React.useDebugValue( i18n.i18nLocale );
-	return i18n;
+export const useI18n = (): I18nReact => {
+	const ctx = React.useContext( I18nContext );
+	React.useDebugValue( ctx.i18nlocale );
+	return ctx;
 };
 
 /**
@@ -66,9 +76,27 @@ export const useI18n = (): I18nProps => {
  * }
  * export default withI18n( MyComponent );
  */
-export const withI18n = createHigherOrderComponent< I18nProps >( InnerComponent => {
+export const withI18n = createHigherOrderComponent< I18nReact >( InnerComponent => {
 	return props => {
 		const i18n = useI18n();
 		return <InnerComponent { ...i18n } { ...props } />;
 	};
 }, 'withI18n' );
+
+/**
+ * Utility to make a new context value
+ *
+ * @param locale The locale of the context value
+ * @param i18n The I18n instance for translation functions
+ *
+ * @returns The context value with bound translation functions
+ */
+function makeContextValue( locale: string, i18n: I18n ): I18nReact {
+	return {
+		i18nlocale: locale,
+		__: i18n.__.bind( i18n ),
+		_n: i18n._n.bind( i18n ),
+		_nx: i18n._nx.bind( i18n ),
+		_x: i18n._x.bind( i18n ),
+	};
+}
