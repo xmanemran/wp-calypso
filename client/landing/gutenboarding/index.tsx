@@ -2,11 +2,10 @@
  * External dependencies
  */
 import '@automattic/calypso-polyfills';
-import { setLocaleData } from '@wordpress/i18n';
 import { I18nProvider } from '@automattic/react-i18n';
 import { getLanguageSlugs } from '../../lib/i18n-utils';
 import { getLanguageFile, switchWebpackCSS } from '../../lib/i18n-utils/switch-locale';
-import React from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import ReactDom from 'react-dom';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import config from '../../config';
@@ -61,10 +60,9 @@ window.AppBoot = async () => {
 	accessibleFocus();
 	
 	let locale = DEFAULT_LOCALE_SLUG;
+	let localeData;
 	try {
-		const [ userLocale, localeData ] = await getLocale();
-		setLocaleData( localeData );
-		locale = userLocale;
+		[ locale, localeData ] = await getLocale();
 
 		// FIXME: Use rtl detection tooling
 		if ( ( localeData as any )[ 'text direction\u0004ltr' ]?.[ 0 ] === 'rtl' ) {
@@ -73,7 +71,7 @@ window.AppBoot = async () => {
 	} catch {}
 
 	ReactDom.render(
-		<I18nProvider locale={ locale }>
+		<CalypsoI18nProvider initialLocale={ locale } initialLocaleData={ localeData as any }>
 			<BrowserRouter basename="gutenboarding">
 				<Switch>
 					<Route exact path={ path }>
@@ -84,8 +82,33 @@ window.AppBoot = async () => {
 					</Route>
 				</Switch>
 			</BrowserRouter>
-		</I18nProvider>,
+		</CalypsoI18nProvider>,
 		document.getElementById( 'wpcom' )
+	);
+};
+
+const CalypsoI18nProvider: FunctionComponent< {
+	initialLocale: string;
+	initialLocaleData: any;
+} > = ( { children, initialLocale, initialLocaleData } ) => {
+	const [ [ locale, localeData ], setLocale ] = React.useState( [
+		initialLocale,
+		initialLocaleData,
+	] );
+
+	// Debugging
+	useEffect( () => {
+		window.updateLocale = async ( newLocale: string ) => {
+			try {
+				const newLocaleData = await getLanguageFile( newLocale );
+				setLocale( [ newLocale, newLocaleData ] );
+			} catch {}
+		};
+	}, [] );
+	return (
+		<I18nProvider locale={ locale } localeData={ localeData }>
+			{ children }
+		</I18nProvider>
 	);
 };
 

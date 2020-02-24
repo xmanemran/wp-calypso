@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useI18n } from '@automattic/react-i18n';
+import { useI18n, withI18n } from '@automattic/react-i18n';
 import { Button, Icon } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import React, { FunctionComponent, useEffect, useCallback, useState } from 'react';
@@ -79,11 +79,6 @@ const Header: FunctionComponent = () => {
 	const currentDomain = domain ?? freeDomainSuggestion;
 
 	/* eslint-disable wpcalypso/jsx-classname-namespace */
-	const siteTitleElement = (
-		<span className="gutenboarding__site-title">
-			{ siteTitle ? siteTitle : NO__( 'Create your site' ) }
-		</span>
-	);
 
 	const domainElement = (
 		<span
@@ -172,11 +167,11 @@ const Header: FunctionComponent = () => {
 							}
 							queryParameters={ { vertical: siteVertical?.id } }
 						>
-							{ siteTitleElement }
+							<STR siteTitle={ siteTitle } />
 							{ domainElement }
 						</DomainPickerButton>
 					) : (
-						siteTitleElement
+						<STR siteTitle={ siteTitle } />
 					) }
 				</div>
 			</div>
@@ -203,3 +198,15 @@ const Header: FunctionComponent = () => {
 };
 
 export default Header;
+
+const STR = withI18n(
+	class extends React.PureComponent {
+		render() {
+			return (
+				<span className="gutenboarding__site-title">
+					{ this.props.siteTitle ? this.props.siteTitle : this.props.__( 'Create your site' ) }
+				</span>
+			);
+		}
+	}
+);
