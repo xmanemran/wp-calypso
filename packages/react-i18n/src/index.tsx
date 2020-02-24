@@ -19,16 +19,16 @@ const I18nContext = React.createContext< I18nReact >( makeContextValue( DEFAULT_
 
 interface Props {
 	locale?: string;
-	localeData?: { [ key: string ]: string[] };
+	localeData?: LocaleData;
 }
 export const I18nProvider: React.FunctionComponent< Props > = ( {
 	children,
 	locale = 'en',
 	localeData,
 } ) => {
-	const makeStableContext = memize( makeContextValue );
+	const makeStableContext = React.useRef< typeof makeContextValue >( memize( makeContextValue ) );
 	return (
-		<I18nContext.Provider value={ makeStableContext( locale, localeData ) }>
+		<I18nContext.Provider value={ makeStableContext.current( locale, localeData ) }>
 			{ children }
 		</I18nContext.Provider>
 	);
@@ -80,7 +80,7 @@ export const withI18n = createHigherOrderComponent< I18nReact >( InnerComponent 
  *
  * @returns The context value with bound translation functions
  */
-function makeContextValue( locale: string, localeData: LocaleData ): I18nReact {
+function makeContextValue( locale: string, localeData?: LocaleData ): I18nReact {
 	const i18n = new I18n( localeData );
 	return {
 		i18nlocale: locale,
