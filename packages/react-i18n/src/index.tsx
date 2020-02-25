@@ -7,30 +7,23 @@ import { I18n, LocaleData } from './i18n-locale';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 export interface I18nReact {
-	i18nlocale: string;
 	__: I18n[ '__' ];
 	_n: I18n[ '_n' ];
 	_nx: I18n[ '_nx' ];
 	_x: I18n[ '_x' ];
 }
 
-const DEFAULT_LOCALE = 'en';
-const I18nContext = React.createContext< I18nReact >( makeContextValue( DEFAULT_LOCALE, {} ) );
+const I18nContext = React.createContext< I18nReact >( makeContextValue() );
 
 interface Props {
-	locale?: string;
 	localeData?: LocaleData;
 }
-export const I18nProvider: React.FunctionComponent< Props > = ( {
-	children,
-	locale = 'en',
-	localeData,
-} ) => {
+export const I18nProvider: React.FunctionComponent< Props > = ( { children, localeData } ) => {
 	const makeStableContext = React.useRef< typeof makeContextValue >(
 		memize( makeContextValue, { maxSize: 1 } )
 	);
 	return (
-		<I18nContext.Provider value={ makeStableContext.current( locale, localeData ) }>
+		<I18nContext.Provider value={ makeStableContext.current( localeData ) }>
 			{ children }
 		</I18nContext.Provider>
 	);
@@ -49,7 +42,6 @@ export const I18nProvider: React.FunctionComponent< Props > = ( {
  */
 export const useI18n = (): I18nReact => {
 	const ctx = React.useContext( I18nContext );
-	React.useDebugValue( ctx.i18nlocale );
 	return ctx;
 };
 
@@ -77,15 +69,13 @@ export const withI18n = createHigherOrderComponent< I18nReact >( InnerComponent 
 /**
  * Utility to make a new context value
  *
- * @param locale The locale of the context value
  * @param localeData The localeData
  *
  * @returns The context value with bound translation functions
  */
-function makeContextValue( locale: string, localeData?: LocaleData ): I18nReact {
+function makeContextValue( localeData?: LocaleData ): I18nReact {
 	const i18n = new I18n( localeData );
 	return {
-		i18nlocale: locale,
 		__: i18n.__.bind( i18n ),
 		_n: i18n._n.bind( i18n ),
 		_nx: i18n._nx.bind( i18n ),
