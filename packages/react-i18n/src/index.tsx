@@ -40,10 +40,7 @@ export const I18nProvider: React.FunctionComponent< Props > = ( { children, loca
  *   return <div>{ __( 'Translate me.', 'text-domain' ) }</div>;
  * }
  */
-export const useI18n = (): I18nReact => {
-	const ctx = React.useContext( I18nContext );
-	return ctx;
-};
+export const useI18n = (): I18nReact => React.useContext( I18nContext );
 
 /**
  * React hook providing i18n translate functions
