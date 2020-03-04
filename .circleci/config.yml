@@ -206,7 +206,7 @@ jobs:
           paths:
             - wp-calypso
 
-  EXPERIMENTAL-translate:
+  translate:
     docker:
       - image: circleci/node:lts
     working_directory: ~/wp-calypso
@@ -233,60 +233,6 @@ jobs:
           working_directory: wp-babel-makepot
           command: npm run sanitize-pot
       - run: mv ~/wp-calypso/wp-babel-makepot/build/bundle-strings.pot "$CIRCLE_ARTIFACTS/translate/calypso-strings.pot"
-      - store-artifacts-and-test-results
-
-  typecheck:
-    <<: *defaults
-    parallelism: 1
-    steps:
-      - prepare
-      - run:
-          name: TypeScript typecheck
-          # Report but don't fail the build (`|| exit 0`)
-          command: npm run typecheck || exit 0
-
-  typecheck-strict:
-    <<: *defaults
-    parallelism: 1
-    steps:
-      - prepare
-      - run:
-          name: TypeScript strict typecheck of individual subprojects
-          command: npm run tsc -- --project client/landing/gutenboarding
-
-  lint-and-translate:
-    <<: *defaults
-    parallelism: 1
-    steps:
-      - prepare
-      - run:
-          name: Lint Config Keys
-          when: always
-          command: npm run lint:config-defaults
-      - run:
-          name: Lint Client and Server
-          when: always
-          command: |
-            # We may not have files to lint which returns non-0 exit
-            # Ensure this does not cause job failure (see `|| exit 0`)
-            FILES_TO_LINT=$(
-              git diff --name-only --diff-filter=d origin/master... \
-                | grep -E '^(client/|server/|packages/)'            \
-                | grep -E '\.[jt]sx?$'
-            ) || exit 0
-
-            if [[ ! -z $FILES_TO_LINT ]]; then
-              ./node_modules/.bin/eslint                                \
-                --format junit                                          \
-                --output-file "$CIRCLE_TEST_REPORTS/eslint/results.xml" \
-                $FILES_TO_LINT
-            fi
-      - run:
-          name: Build calypso-strings.pot
-          when: always
-          command: |
-            npm run translate
-            mv calypso-strings.pot "$CIRCLE_ARTIFACTS/translate"
       - run:
           name: Build New Strings .pot
           when: always
@@ -317,6 +263,53 @@ jobs:
                       "vcs_type": "github"
                     }
                   }'
+
+  typecheck:
+    <<: *defaults
+    parallelism: 1
+    steps:
+      - prepare
+      - run:
+          name: TypeScript typecheck
+          # Report but don't fail the build (`|| exit 0`)
+          command: npm run typecheck || exit 0
+
+  typecheck-strict:
+    <<: *defaults
+    parallelism: 1
+    steps:
+      - prepare
+      - run:
+          name: TypeScript strict typecheck of individual subprojects
+          command: npm run tsc -- --project client/landing/gutenboarding
+
+  lint:
+    <<: *defaults
+    parallelism: 1
+    steps:
+      - prepare
+      - run:
+          name: Lint Config Keys
+          when: always
+          command: npm run lint:config-defaults
+      - run:
+          name: Lint Client and Server
+          when: always
+          command: |
+            # We may not have files to lint which returns non-0 exit
+            # Ensure this does not cause job failure (see `|| exit 0`)
+            FILES_TO_LINT=$(
+              git diff --name-only --diff-filter=d origin/master... \
+                | grep -E '^(client/|server/|packages/)'            \
+                | grep -E '\.[jt]sx?$'
+            ) || exit 0
+
+            if [[ ! -z $FILES_TO_LINT ]]; then
+              ./node_modules/.bin/eslint                                \
+                --format junit                                          \
+                --output-file "$CIRCLE_TEST_REPORTS/eslint/results.xml" \
+                $FILES_TO_LINT
+            fi
 
   build-notifications:
     <<: *defaults
