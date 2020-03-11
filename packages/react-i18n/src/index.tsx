@@ -3,8 +3,10 @@
  */
 import * as React from 'react';
 import memize from 'memize';
-import { I18n, LocaleData } from './i18n-locale';
+import { createI18n, LocaleData } from './create-i18n';
 import { createHigherOrderComponent } from '@wordpress/compose';
+
+type I18n = ReturnType< typeof createI18n >;
 
 export interface I18nReact {
 	__: I18n[ '__' ];
@@ -71,7 +73,7 @@ export const withI18n = createHigherOrderComponent< I18nReact >( InnerComponent 
  * @returns The context value with bound translation functions
  */
 function makeContextValue( localeData?: LocaleData ): I18nReact {
-	const i18n = new I18n( localeData );
+	const i18n = createI18n( localeData );
 	return {
 		__: i18n.__.bind( i18n ),
 		_n: i18n._n.bind( i18n ),
