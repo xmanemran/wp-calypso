@@ -155,7 +155,7 @@ const Header: FunctionComponent = () => {
 					<Icon icon="wordpress-alt" className="gutenboarding__header-wp-icon" />
 				</div>
 				<div className="gutenboarding__header-group">
-					<I18nProvider locale="fr" localeData={ ld.current }>
+					<I18nProvider localeData={ ld.current }>
 						{ siteTitle ? (
 							<DomainPickerButton
 								className="gutenboarding__header-domain-picker-button"
@@ -204,7 +204,7 @@ const Header: FunctionComponent = () => {
 export default Header;
 
 const STR = withI18n(
-	class extends React.PureComponent {
+	class extends React.PureComponent< { siteTitle: string } > {
 		render() {
 			console.log( 'Rerendered!' );
 			return (
