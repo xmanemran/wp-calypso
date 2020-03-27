@@ -33,6 +33,7 @@ import { protectForm } from 'lib/protect-form';
 import { saveWordadsSettings } from 'state/wordads/settings/actions';
 import getJetpackSettings from 'state/selectors/get-jetpack-settings';
 import QueryJetpackSettings from 'components/data/query-jetpack-settings';
+import SupportInfo from 'components/support-info';
 
 class AdsFormSettings extends Component {
 	static propTypes = {
@@ -459,8 +460,15 @@ class AdsFormSettings extends Component {
 
 	ccpaOptions() {
 		const { translate } = this.props;
+		const support = {
+			text:
+				'Enables targeted advertising in California using an opt-out link in compliance with the California Consumer Privacy Act (CCPA).',
+			link: 'https://jetpack.com/support/ads/',
+			privacyLink: false,
+		};
 		return (
 			<CompactFormToggle checked={ this.props.wordadsJetpack.wordads_ccpa_enabled }>
+				<SupportInfo { ...support } />
 				<span>{ translate( 'Enable targeted advertising in California (CCPA)' ) }</span>
 			</CompactFormToggle>
 		);
