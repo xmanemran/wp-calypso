@@ -465,9 +465,7 @@ class AdsFormSettings extends Component {
 		const { translate } = this.props;
 		return (
 			<CompactFormToggle checked={ this.props.wordadsJetpack.wordads_ccpa_enabled }>
-				<span className="jp-form-toggle-explanation">
-					{ translate( 'Enable targeted advertising in California (CCPA)' ) }
-				</span>
+				<span>{ translate( 'Enable targeted advertising in California (CCPA)' ) }</span>
 			</CompactFormToggle>
 		);
 	}
