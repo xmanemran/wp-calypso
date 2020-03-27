@@ -43,16 +43,11 @@ class AdsFormSettings extends Component {
 
 	state = {};
 
-	UNSAFE_componentWillReceiveProps( { wordadsSettings, wordadsJetpack } ) {
+	UNSAFE_componentWillReceiveProps( { wordadsSettings } ) {
 		if ( isEmpty( this.state ) && wordadsSettings ) {
 			this.setState( {
 				...this.defaultSettings(),
 				...wordadsSettings,
-			} );
-		}
-		if ( wordadsJetpack ) {
-			this.setState( {
-				wordadsJetpack: wordadsJetpack,
 			} );
 		}
 	}
@@ -143,6 +138,7 @@ class AdsFormSettings extends Component {
 	jetpackPlacementControls() {
 		const { translate, site } = this.props;
 		const linkHref = '/marketing/traffic/' + site?.slug;
+
 		return <Card href={ linkHref }>{ translate( 'Manage ad placements' ) }</Card>;
 	}
 
