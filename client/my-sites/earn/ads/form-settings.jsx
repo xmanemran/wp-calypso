@@ -27,10 +27,12 @@ import QueryWordadsSettings from 'components/data/query-wordads-settings';
 import SectionHeader from 'components/section-header';
 import { getSelectedSite, getSelectedSiteId } from 'state/ui/selectors';
 import { getWordadsSettings } from 'state/selectors/get-wordads-settings';
-import { isJetpackSite } from 'state/sites/selectors';
+import { isJetpackSite, isJetpackModuleActive } from 'state/sites/selectors';
 import { dismissWordAdsSuccess } from 'state/wordads/approve/actions';
 import { protectForm } from 'lib/protect-form';
 import { saveWordadsSettings } from 'state/wordads/settings/actions';
+import getJetpackSettings from 'state/selectors/get-jetpack-settings';
+import QueryJetpackSettings from 'components/data/query-jetpack-settings';
 
 class AdsFormSettings extends Component {
 	static propTypes = {
@@ -41,11 +43,16 @@ class AdsFormSettings extends Component {
 
 	state = {};
 
-	UNSAFE_componentWillReceiveProps( { wordadsSettings } ) {
+	UNSAFE_componentWillReceiveProps( { wordadsSettings, wordadsJetpack } ) {
 		if ( isEmpty( this.state ) && wordadsSettings ) {
 			this.setState( {
 				...this.defaultSettings(),
 				...wordadsSettings,
+			} );
+		}
+		if ( wordadsJetpack ) {
+			this.setState( {
+				wordadsJetpack: wordadsJetpack,
 			} );
 		}
 	}
@@ -136,7 +143,6 @@ class AdsFormSettings extends Component {
 	jetpackPlacementControls() {
 		const { translate, site } = this.props;
 		const linkHref = '/marketing/traffic/' + site?.slug;
-
 		return <Card href={ linkHref }>{ translate( 'Manage ad placements' ) }</Card>;
 	}
 
@@ -455,6 +461,17 @@ class AdsFormSettings extends Component {
 		);
 	}
 
+	ccpaOptions() {
+		const { translate } = this.props;
+		return (
+			<CompactFormToggle checked={ this.props.wordadsJetpack.wordads_ccpa_enabled }>
+				<span className="jp-form-toggle-explanation">
+					{ translate( 'Enable targeted advertising in California (CCPA)' ) }
+				</span>
+			</CompactFormToggle>
+		);
+	}
+
 	render() {
 		const { isLoading, site, translate } = this.props;
 
@@ -463,7 +480,7 @@ class AdsFormSettings extends Component {
 		return (
 			<Fragment>
 				<QueryWordadsSettings siteId={ site.ID } />
-
+				<QueryJetpackSettings siteId={ site.ID } />
 				{ this.props.siteIsJetpack && isWordAds ? this.jetpackPlacementControls() : null }
 
 				<SectionHeader label={ translate( 'Ads Settings' ) }>
@@ -493,6 +510,8 @@ class AdsFormSettings extends Component {
 
 						<FormSectionHeading>{ translate( 'Terms of Service' ) }</FormSectionHeading>
 						{ this.acceptCheckbox() }
+						<FormSectionHeading>{ translate( 'CCPA' ) }</FormSectionHeading>
+						{ this.ccpaOptions() }
 					</form>
 				</Card>
 			</Fragment>
@@ -506,12 +525,14 @@ export default compose(
 			const siteId = getSelectedSiteId( state );
 			const isSavingSettings = isSavingWordadsSettings( state, siteId );
 			const wordadsSettings = getWordadsSettings( state, siteId );
-
+			const jetpackSettings = getJetpackSettings( state, siteId );
 			return {
 				isLoading: isSavingSettings || ! wordadsSettings,
 				site: getSelectedSite( state ),
 				siteIsJetpack: isJetpackSite( state, siteId ),
 				wordadsSettings,
+				wordadsJetpack: jetpackSettings,
+				wordadsJetpackActive: isJetpackModuleActive( state, siteId, 'wordads' ),
 			};
 		},
 		{ dismissWordAdsSuccess, saveWordadsSettings }
