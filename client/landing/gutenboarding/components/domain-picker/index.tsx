@@ -2,8 +2,9 @@
  * External dependencies
  */
 import React, { FunctionComponent } from 'react';
-import { Button, Panel, PanelBody, PanelRow, TextControl, Icon } from '@wordpress/components';
+import { Button, Panel, PanelBody, PanelRow, TextControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { Icon, search, tag } from '@wordpress/icons';
 import { times } from 'lodash';
 import { useI18n } from '@automattic/react-i18n';
 
@@ -52,46 +53,6 @@ export interface Props {
 	currentDomain?: DomainSuggestion;
 }
 
-const FreeDomainIcon = () => (
-	<Icon
-		icon={ () => (
-			<svg
-				width="15"
-				height="15"
-				viewBox="0 0 15 15"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path
-					d="M13.2878 8.60833L8.61291 13.2844C8.4918 13.4057 8.34798 13.5019 8.18968 13.5676C8.03137 13.6332 7.86169 13.667 7.69032 13.667C7.51895 13.667 7.34926 13.6332 7.19096 13.5676C7.03265 13.5019 6.88884 13.4057 6.76773 13.2844L1.16699 7.68876V1.16699H7.68706L13.2878 6.76919C13.5307 7.01358 13.667 7.34417 13.667 7.68876C13.667 8.03335 13.5307 8.36395 13.2878 8.60833V8.60833Z"
-					stroke="#008A20"
-					strokeWidth="1.5"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				/>
-				<circle cx="4.50033" cy="4.50033" r="0.833333" fill="#008A20" />
-			</svg>
-		) }
-	/>
-);
-
-const SearchIcon = () => (
-	<Icon
-		icon={ () => (
-			<svg
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path d="M6 18L10 14.5" stroke="black" strokeWidth="1.5" />
-				<circle cx="13.5" cy="11.5" r="4.75" stroke="black" strokeWidth="1.5" />
-			</svg>
-		) }
-	/>
-);
-
 const DomainPicker: FunctionComponent< Props > = ( { onDomainSelect, onClose, currentDomain } ) => {
 	const { __: NO__ } = useI18n();
 	const label = NO__( 'Search for a domain' );
@@ -116,7 +77,9 @@ const DomainPicker: FunctionComponent< Props > = ( { onDomainSelect, onClose, cu
 						<CloseButton onClose={ () => onClose() } />
 					</div>
 					<div className="domain-picker__search">
-						<SearchIcon />
+						<div className="domain-picker__search-icon">
+							<Icon icon={ search } />
+						</div>
 						<TextControl
 							hideLabelFromVision
 							label={ label }
@@ -129,7 +92,7 @@ const DomainPicker: FunctionComponent< Props > = ( { onDomainSelect, onClose, cu
 
 				<PanelRow className="domain-picker__panel-row">
 					<p className="domain-picker__free-text">
-						<FreeDomainIcon />
+						<Icon icon={ tag } />
 						{ NO__( 'Free for the first year with any paid plan' ) }
 					</p>
 				</PanelRow>
