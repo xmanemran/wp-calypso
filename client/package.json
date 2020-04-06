@@ -46,6 +46,7 @@
 		"@wordpress/element": "2.11.0",
 		"@wordpress/format-library": "1.14.1",
 		"@wordpress/i18n": "3.9.0",
+		"@wordpress/icons": "1.2.0",
 		"@wordpress/is-shallow-equal": "1.8.0",
 		"@wordpress/keycodes": "2.9.0",
 		"@wordpress/notices": "2.0.0",
