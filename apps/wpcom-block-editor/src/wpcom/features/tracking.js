@@ -205,6 +205,13 @@ const trackSearchBlocks = ( { context } ) => {
 	} );
 };
 
+const trackSearchBlocksNotFound = ( { context } ) => {
+	tracksRecordEvent( 'wpcom_block_picker_no_results', {
+		search_term: select( 'automattic/tracking' ).getSearchTerm( context ),
+		context,
+	} );
+};
+
 /**
  * Tracker can be
  * - string - which means it is an event name and should be tracked as such automatically
@@ -239,6 +246,7 @@ const REDUX_TRACKING = {
 	},
 	'automattic/tracking': {
 		setSearchBlocks: trackSearchBlocks,
+		setSearchBlocksNotFound: trackSearchBlocksNotFound,
 	},
 };
 
