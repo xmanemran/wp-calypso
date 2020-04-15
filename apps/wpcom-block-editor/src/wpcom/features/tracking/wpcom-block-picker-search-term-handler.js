@@ -9,33 +9,28 @@ import debug from 'debug';
 /**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import tracksRecordEvent from './track-record-event';
+import { select, dispatch } from '@wordpress/data';
 
 const tracksDebug = debug( 'wpcom-block-editor:analytics:tracks:block-search' );
 
 let lastSearchTerm;
 const trackSearchTerm = ( event, target ) => {
+	// Actions dispatcher.
+	const { setSearchBlocksTerm, setSearchBlocks, setSearchBlocksNotFound } = dispatch(
+		'automattic/tracking'
+	);
+
+	// Get the search term from the event object.
 	const key = event.key || event.keyCode;
-	const search_term = ( target.value || '' ).trim().toLowerCase();
+	const searchTerm = ( target.value || '' ).trim().toLowerCase();
 
-	if ( lastSearchTerm === search_term && 'Enter' !== key ) {
-		return tracksDebug( 'Same term: %o, type %o key. Skip.', search_term, key );
+	// Check if it's a duplicated query.
+	if ( lastSearchTerm === searchTerm && 'Enter' !== key ) {
+		return tracksDebug( 'Same term: %o, type %o key. Skip.', searchTerm, key );
 	}
-	lastSearchTerm = search_term;
+	lastSearchTerm = searchTerm;
 
-	if ( search_term.length < 3 ) {
-		return;
-	}
-
-	const eventProperties = {
-		search_term,
-		context: 'inserter_menu',
-	};
+	const eventProperties = { value: searchTerm, context: 'inserter_menu' };
 
 	/*
 	 * Populate event properties with `selected_block`
@@ -46,15 +41,22 @@ const trackSearchTerm = ( event, target ) => {
 		eventProperties.selected_block = selectedBlock.name;
 	}
 
-	tracksRecordEvent( 'wpcom_block_picker_search_term', { ...eventProperties } );
+	setSearchBlocksTerm( eventProperties );
 
-	// Create a separate event for search with no results to make it easier to filter by them
-	const hasResults = document.querySelectorAll( '.block-editor-inserter__no-results' ).length === 0;
-	if ( hasResults ) {
+	if ( searchTerm.length < 3 ) {
 		return;
 	}
 
-	tracksRecordEvent( 'wpcom_block_picker_no_results', { ...eventProperties } );
+	const blocksNotFound =
+		document.querySelectorAll( '.block-editor-inserter__no-results' ).length !== 0;
+
+	// Dispatch search blocks action.
+	setSearchBlocks( { ...eventProperties, notFound: blocksNotFound } );
+
+	// Create a separate event for search with no results to make it easier to filter by them.
+	if ( blocksNotFound ) {
+		setSearchBlocksNotFound( eventProperties );
+	}
 };
 
 /**
