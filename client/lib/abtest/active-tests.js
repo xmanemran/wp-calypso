@@ -115,4 +115,13 @@ export default {
 		defaultVariation: 'control',
 		allowExistingUsers: false,
 	},
+	whiteGloveUpsell: {
+		datestamp: '20200428',
+		variations: {
+			variantShowOffer: 50,
+			control: 50,
+		},
+		defaultVariation: 'control',
+		allowExistingUsers: false,
+	},
 };

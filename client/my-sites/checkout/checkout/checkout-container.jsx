@@ -76,6 +76,7 @@ class CheckoutContainer extends React.Component {
 			shouldShowCart = true,
 			clearTransaction,
 			isComingFromGutenboarding,
+			isWhiteGloveOffer,
 		} = this.props;
 
 		const TransactionData = clearTransaction ? CartData : CheckoutData;
@@ -111,6 +112,7 @@ class CheckoutContainer extends React.Component {
 							redirectTo={ redirectTo }
 							upgradeIntent={ upgradeIntent }
 							hideNudge={ isComingFromGutenboarding }
+							isWhiteGloveOffer={ isWhiteGloveOffer }
 						>
 							{ this.props.children }
 						</Checkout>
@@ -118,7 +120,10 @@ class CheckoutContainer extends React.Component {
 
 					{ shouldShowCart && (
 						<CartData>
-							<SecondaryCart selectedSite={ selectedSite } />
+							<SecondaryCart
+								selectedSite={ selectedSite }
+								isWhiteGloveOffer={ isWhiteGloveOffer }
+							/>
 						</CartData>
 					) }
 				</div>
