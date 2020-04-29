@@ -22,6 +22,7 @@ import {
 	getDomainRegistrationAgreementUrl,
 	getDisplayName,
 	getPartnerName,
+	getProductDescription,
 	getRenewalPrice,
 	handleRenewNowClick,
 	hasAmountAvailableToRefund,
@@ -39,6 +40,7 @@ import {
 } from 'lib/purchases';
 import { canEditPaymentDetails, getEditCardDetailsPath, isDataLoading } from '../utils';
 import { getByPurchaseId, hasLoadedUserPurchasesFromServer } from 'state/purchases/selectors';
+import { getAvailableProductsBySiteId } from 'state/sites/products/selectors';
 import { getCanonicalTheme } from 'state/themes/selectors';
 import isSiteAtomic from 'state/selectors/is-site-automated-transfer';
 import Gridicon from 'components/gridicon';
@@ -54,10 +56,14 @@ import {
 	isDomainTransfer,
 	isTheme,
 	isJetpackProduct,
+	isJetpackSearch,
 	isConciergeSession,
 } from 'lib/products-values';
 import { getSite, isRequestingSites } from 'state/sites/selectors';
-import { JETPACK_PRODUCTS_LIST } from 'lib/products-values/constants';
+import {
+	getShortNameCallbackForJetpackSearch,
+	JETPACK_PRODUCTS_LIST,
+} from 'lib/products-values/constants';
 import { JETPACK_PLANS } from 'lib/plans/constants';
 import Main from 'components/main';
 import PlanPrice from 'my-sites/plan-price';
@@ -68,6 +74,7 @@ import PurchasePlanDetails from './plan-details';
 import PurchaseSiteHeader from '../purchases-site/header';
 import QueryCanonicalTheme from 'components/data/query-canonical-theme';
 import QuerySiteDomains from 'components/data/query-site-domains';
+import QuerySiteProducts from 'components/data/query-site-products';
 import QueryUserPurchases from 'components/data/query-user-purchases';
 import RemovePurchase from '../remove-purchase';
 import VerticalNavItem from 'components/vertical-nav/item';
@@ -393,6 +400,28 @@ class ManagePurchase extends Component {
 				'Transfers an existing domain from another provider to WordPress.com, ' +
 					'helping you manage your site and domain in one place.'
 			);
+		} else if ( isJetpackProduct( purchase ) ) {
+			description = (
+				<Fragment>
+					<div className="manage-purchase__description-subcontent">
+						{ getProductDescription( purchase ) }
+					</div>
+					{ isJetpackSearch( purchase ) && (
+						<div className="manage-purchase__description-subcontent">
+							{ translate( '{{strong}}Your Search Tier{{/strong}}: %(tierDescription)s.', {
+								args: {
+									tierDescription: getShortNameCallbackForJetpackSearch( this.props.siteProduct ),
+								},
+								comment: 'An example tier description would read: "Up to 100 records"',
+								components: { strong: <strong /> },
+							} ) }{ ' ' }
+							<a href="https://jetpack.com/support/search/#pricing">
+								{ translate( 'Learn more about search tiers.' ) }
+							</a>
+						</div>
+					) }
+				</Fragment>
+			);
 		}
 
 		const registrationAgreementUrl = getDomainRegistrationAgreementUrl( purchase );
@@ -400,12 +429,12 @@ class ManagePurchase extends Component {
 
 		return (
 			<div className="manage-purchase__content">
-				<span className="manage-purchase__description">{ description }</span>
-				<span className="manage-purchase__settings-link">
-					{ ! isPartnerPurchase( purchase ) && site && (
+				<div className="manage-purchase__description">{ description }</div>
+				{ ! isPartnerPurchase( purchase ) && site && (
+					<div className="manage-purchase__settings-link">
 						<ProductLink purchase={ purchase } selectedSite={ site } />
-					) }
-				</span>
+					</div>
+				) }
 				{ registrationAgreementUrl && (
 					<a href={ registrationAgreementUrl } target="_blank" rel="noopener noreferrer">
 						{ domainRegistrationAgreementLinkText }
@@ -532,6 +561,7 @@ class ManagePurchase extends Component {
 					title="Purchases > Manage Purchase"
 				/>
 				<QueryUserPurchases userId={ this.props.userId } />
+				<QuerySiteProducts siteId={ this.props.siteId } />
 				{ siteId && <QuerySiteDomains siteId={ siteId } /> }
 				{ isPurchaseTheme && <QueryCanonicalTheme siteId={ siteId } themeId={ purchase.meta } /> }
 				<Main className={ classes }>
@@ -567,6 +597,10 @@ export default connect( ( state, props ) => {
 	const site = getSite( state, siteId );
 	const hasLoadedSites = ! isRequestingSites( state );
 	const hasLoadedDomains = hasLoadedSiteDomains( state, siteId );
+	const siteProduct =
+		purchase && getAvailableProductsBySiteId( state, siteId ).data
+			? getAvailableProductsBySiteId( state, siteId ).data[ purchase.productSlug ]
+			: null;
 	return {
 		hasLoadedDomains,
 		hasLoadedSites,
@@ -578,6 +612,7 @@ export default connect( ( state, props ) => {
 		purchase,
 		siteId,
 		site,
+		siteProduct,
 		plan: isPurchasePlan && applyTestFiltersToPlansList( purchase.productSlug, abtest ),
 		isPurchaseTheme,
 		theme: isPurchaseTheme && getCanonicalTheme( state, siteId, purchase.meta ),
