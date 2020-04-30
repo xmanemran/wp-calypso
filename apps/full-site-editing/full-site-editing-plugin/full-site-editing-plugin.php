@@ -265,3 +265,11 @@ function load_premium_content() {
 	require_once __DIR__ . '/premium-content/premium-content.php';
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\load_premium_content' );
+
+/**
+ * Load WPCOM block editor nav sidebar
+ */
+function load_wpcom_block_editor_sidebar() {
+	require_once __DIR__ . '/wpcom-block-editor-nav-sidebar/class-wpcom-block-editor-nav-sidebar.php';
+}
+add_action( 'plugins_loaded', __NAMESPACE__ . '\load_wpcom_block_editor_sidebar' );
