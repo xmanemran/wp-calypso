@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-import React, { FunctionComponent, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslate } from 'i18n-calypso';
+import React, { FunctionComponent, useCallback, useState } from 'react';
 
 /**
  * Internal dependencies
@@ -12,15 +12,14 @@ import { Button } from '@automattic/components';
 import { defaultRewindConfig, RewindConfig } from './types';
 import { rewindBackup } from 'state/activity-log/actions';
 import CheckYourEmail from './rewind-flow-notice/check-your-email';
+import Error from './error';
 import getBackupDownloadId from 'state/selectors/get-backup-download-id';
 import getBackupDownloadProgress from 'state/selectors/get-backup-download-progress';
 import getBackupDownloadUrl from 'state/selectors/get-backup-download-url';
-import Gridicon from 'components/gridicon';
 import ProgressBar from './progress-bar';
 import QueryRewindBackupStatus from 'components/data/query-rewind-backup-status';
 import RewindConfigEditor from './rewind-config-editor';
 import RewindFlowNotice, { RewindFlowNoticeLevel } from './rewind-flow-notice';
-import contactSupportUrl from 'landing/jetpack-cloud/lib/contact-support-url';
 
 interface Props {
 	backupDisplayDate: string;
@@ -158,31 +157,6 @@ const BackupDownloadFlow: FunctionComponent< Props > = ( {
 		</>
 	);
 
-	const renderError = () => (
-		<>
-			<div className="rewind-flow__header">
-				<img
-					src="/calypso/images/illustrations/jetpack-cloud-download-failure.svg"
-					alt="jetpack cloud download error"
-				/>
-			</div>
-			<h3 className="rewind-flow__title">
-				{ translate( 'An error occurred while creating your download' ) }
-			</h3>
-			<Button
-				className="rewind-flow__primary-button"
-				href={ contactSupportUrl( siteUrl, 'error' ) }
-				primary
-				rel="noopener noreferrer"
-				target="_blank"
-			>
-				{ translate( 'Contact Support {{externalIcon/}}', {
-					components: { externalIcon: <Gridicon icon="external" size={ 24 } /> },
-				} ) }
-			</Button>
-		</>
-	);
-
 	const render = () => {
 		if ( downloadProgress === null && downloadUrl === null ) {
 			return renderConfirm();
@@ -191,8 +165,12 @@ const BackupDownloadFlow: FunctionComponent< Props > = ( {
 		} else if ( downloadUrl !== null ) {
 			return renderReady();
 		}
-
-		return renderError();
+		return (
+			<Error
+				siteUrl={ siteUrl }
+				errorText={ translate( 'An error occurred while creating your download.' ) }
+			/>
+		);
 	};
 
 	return (

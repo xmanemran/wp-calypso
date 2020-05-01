@@ -12,16 +12,16 @@ import { Button } from '@automattic/components';
 import { defaultRewindConfig, RewindConfig } from './types';
 import { rewindRestore } from 'state/activity-log/actions';
 import CheckYourEmail from './rewind-flow-notice/check-your-email';
+import Error from './error';
 import getInProgressRewindPercentComplete from 'state/selectors/get-in-progress-rewind-percent-complete';
 import getInProgressRewindStatus from 'state/selectors/get-in-progress-rewind-status';
 import getRewindState from 'state/selectors/get-rewind-state';
 import Gridicon from 'components/gridicon';
+import Loading from './loading';
 import ProgressBar from './progress-bar';
 import QueryRewindState from 'components/data/query-rewind-state';
 import RewindConfigEditor from './rewind-config-editor';
 import RewindFlowNotice, { RewindFlowNoticeLevel } from './rewind-flow-notice';
-import Spinner from 'components/spinner';
-import contactSupportUrl from 'landing/jetpack-cloud/lib/contact-support-url';
 
 interface Props {
 	backupDisplayDate: string;
@@ -166,43 +166,9 @@ const BackupRestoreFlow: FunctionComponent< Props > = ( {
 		</>
 	);
 
-	const renderError = () => (
-		<>
-			<div className="rewind-flow__header">
-				<img
-					src="/calypso/images/illustrations/jetpack-cloud-download-failure.svg"
-					alt="jetpack cloud download error"
-				/>
-			</div>
-			<h3 className="rewind-flow__title">
-				{ translate( 'An error occurred while restoring your site' ) }
-			</h3>
-			<Button
-				className="rewind-flow__primary-button"
-				href={ contactSupportUrl( siteUrl, 'error' ) }
-				primary
-				rel="noopener noreferrer"
-				target="_blank"
-			>
-				{ translate( 'Contact Support {{externalIcon/}}', {
-					components: { externalIcon: <Gridicon icon="external" size={ 24 } /> },
-				} ) }
-			</Button>
-		</>
-	);
-
-	const renderLoading = () => (
-		<>
-			<div className="rewind-flow__header">
-				<Spinner size={ 48 } />
-			</div>
-			<h3 className="rewind-flow__title-placeholder">{ translate( 'Loading restore status…' ) }</h3>
-		</>
-	);
-
 	const render = () => {
 		if ( loading ) {
-			return renderLoading();
+			return <Loading />;
 		} else if ( ! inProgressRewindStatus && ! userHasRequestedRestore ) {
 			return renderConfirm();
 		} else if (
@@ -214,7 +180,12 @@ const BackupRestoreFlow: FunctionComponent< Props > = ( {
 			return renderFinished();
 		}
 
-		return renderError();
+		return (
+			<Error
+				errorText={ translate( 'An error occurred while restoring your site' ) }
+				siteUrl={ siteUrl }
+			/>
+		);
 	};
 
 	return (
