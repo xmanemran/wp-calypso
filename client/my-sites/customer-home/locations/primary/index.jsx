@@ -17,6 +17,7 @@ import FindDomain from 'my-sites/customer-home/cards/tasks/find-domain';
 import SiteSetupList from 'my-sites/customer-home/cards/tasks/site-setup-list';
 import CelebrateSiteCreation from 'my-sites/customer-home/cards/notices/celebrate-site-creation-v2';
 import CelebrateSiteLaunch from 'my-sites/customer-home/cards/notices/celebrate-site-launch-v2';
+import CelebrateSiteSetupComplete from 'my-sites/customer-home/cards/notices/celebrate-site-setup-complete-v2';
 import config from 'config';
 
 const cardComponents = {
@@ -31,6 +32,7 @@ const cardComponents = {
 	'home-task-webinars': Webinars,
 	'home-notice-celebrate-site-creation': CelebrateSiteCreation,
 	'home-notice-celebrate-site-launch': CelebrateSiteLaunch,
+	'home-notice-celebrate-site-setup-complete': CelebrateSiteSetupComplete,
 };
 
 const Primary = ( { checklistMode, cards } ) => {
