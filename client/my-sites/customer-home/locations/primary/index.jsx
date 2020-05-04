@@ -15,6 +15,7 @@ import ConnectAccounts from 'my-sites/customer-home/cards/tasks/connect-accounts
 import Webinars from 'my-sites/customer-home/cards/tasks/webinars';
 import FindDomain from 'my-sites/customer-home/cards/tasks/find-domain';
 import SiteSetupList from 'my-sites/customer-home/cards/tasks/site-setup-list';
+import CelebrateSiteCreation from 'my-sites/customer-home/cards/notices/celebrate-site-creation-v2';
 import config from 'config';
 
 const cardComponents = {
@@ -27,6 +28,7 @@ const cardComponents = {
 	'home-task-connect-accounts': ConnectAccounts,
 	'home-task-find-domain': FindDomain,
 	'home-task-webinars': Webinars,
+	'home-notice-celebrate-site-creation': CelebrateSiteCreation,
 };
 
 const Primary = ( { checklistMode, cards } ) => {
