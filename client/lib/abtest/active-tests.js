@@ -133,4 +133,13 @@ export default {
 		defaultVariation: 'control',
 		allowExistingUsers: true,
 	},
+	domainShowJPResultsInJapan: {
+		datestamp: '20200506',
+		variations: {
+			variantShowJPResults: 50,
+			control: 50,
+		},
+		localeTargets: 'any',
+		countryCodeTargets: [ 'JP' ],
+	},
 };
