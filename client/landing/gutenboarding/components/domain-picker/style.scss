@@ -254,3 +254,12 @@ $domain-picker__suggestion-item-height: 24px;
 		align-items: center;
 	}
 }
+
+.domain-picker__hsts-info {
+	&.components-button.is-tertiary {
+		&, &:hover:not( :disabled ) {
+			color: var( --color-neutral-100 );
+			border: none;
+		}
+	}
+}

@@ -13,9 +13,10 @@ type DomainSuggestion = import('@automattic/data-stores').DomainSuggestions.Doma
 /**
  * Internal dependencies
  */
-import { STORE_KEY } from '../../stores/onboard';
 import { DOMAIN_SUGGESTION_VENDOR, FLOW_ID } from '../../constants';
 import { RecordTrainTracksEventProps } from '../../lib/analytics';
+import { STORE_KEY } from '../../stores/onboard';
+import HstsInfo from './hsts-info';
 
 interface Props {
 	suggestion: DomainSuggestion;
@@ -49,6 +50,9 @@ const DomainPickerSuggestionItem: FunctionComponent< Props > = ( {
 	const [ previousRailcarId, setPreviousRailcarId ] = useState< string | undefined >();
 
 	const labelId = uuid();
+
+	// Some TLDs require HSTS notice
+	const requiresHsts = [ '.app', '.dev', '.page' ].includes( domainTld );
 
 	useEffect( () => {
 		// Only record TrainTracks render event when the domain name and railcarId change.
@@ -110,6 +114,7 @@ const DomainPickerSuggestionItem: FunctionComponent< Props > = ( {
 				{ isRecommended && (
 					<div className="domain-picker__badge is-recommended">{ __( 'Recommended' ) }</div>
 				) }
+				{ requiresHsts && <HstsInfo tld={ domainTld } /> }
 			</div>
 			<div
 				className={ classnames( 'domain-picker__price', {
