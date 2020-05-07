@@ -9,7 +9,7 @@ references:
     CIRCLE_TEST_REPORTS: /tmp/test_results
 
   docker-image: &docker-image
-    - image: circleci/node:12.16.2-browsers
+    - image: scinos/wp-calypso-ci:1.0.1
 
   setup-results-and-artifacts: &setup-results-and-artifacts
     name: Create Directories for Results and Artifacts
@@ -185,12 +185,12 @@ jobs:
     <<: *defaults
     steps:
       # repo
-      - restore_cache: *restore-git-cache
+      # - restore_cache: *restore-git-cache
       - checkout
       - run: *update-git-master
-      - save_cache: *save-git-cache
+      #- save_cache: *save-git-cache
       # npm dependencies
-      - restore_cache: *restore-yarn-cache
+      #- restore_cache: *restore-yarn-cache
       - run: *yarn-install
       - save_cache: *save-yarn-cache
       - run: yarn run build-packages
