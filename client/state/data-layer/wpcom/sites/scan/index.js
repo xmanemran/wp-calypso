@@ -55,6 +55,7 @@ const formatScanStateRawResponse = ( {
 } ) => {
 	return {
 		state,
+		reason,
 		threats: threats.map( formatScanThreat ),
 		credentials,
 		mostRecent: mostRecent

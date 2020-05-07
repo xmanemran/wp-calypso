@@ -18,23 +18,39 @@ import Upsell from 'landing/jetpack-cloud/components/upsell';
 import { getSelectedSiteSlug } from 'state/ui/selectors';
 import { recordTracksEvent } from 'state/analytics/actions';
 
+function renderUpsell( props ) {
+	if ( 'multisite_not_supported' === props.reason ) {
+		return (
+			<Upsell
+				headerText={ translate( 'Your site does not have scan' ) }
+				bodyText={ translate(
+					'Scan does is currently not supported on WordPress Multi-site setups.'
+				) }
+				buttonLink={ false }
+				iconComponent={ <SecurityIcon icon="info" /> }
+			/>
+		);
+	}
+	return (
+		<Upsell
+			headerText={ translate( 'Your site does not have scan' ) }
+			bodyText={ translate(
+				'Automatic scanning and one-click fixes keep your site one step ahead of security threats.'
+			) }
+			buttonLink={ `https://wordpress.com/checkout/jetpack_scan/${ props?.siteSlug }` }
+			onClick={ () => props?.recordTracksEvent( 'cloud_scan_upsell_click' ) }
+			iconComponent={ <SecurityIcon icon="info" /> }
+		/>
+	);
+}
+
 function ScanUpsellPage( props ) {
 	return (
 		<Main className="scan__main">
 			<DocumentHead title="Scanner" />
 			<SidebarNavigation />
 			<PageViewTracker path="/scan/:site" title="Scanner Upsell" />
-			<div className="scan__content">
-				<Upsell
-					headerText={ translate( 'Your site does not have scan' ) }
-					bodyText={ translate(
-						'Automatic scanning and one-click fixes keep your site one step ahead of security threats.'
-					) }
-					buttonLink={ `https://wordpress.com/checkout/jetpack_scan/${ props.siteSlug }` }
-					onClick={ () => props.recordTracksEvent( 'cloud_scan_upsell_click' ) }
-					iconComponent={ <SecurityIcon icon="info" /> }
-				/>
-			</div>
+			<div className="scan__content">{ renderUpsell( props ) }</div>
 			<StatsFooter
 				noticeText="Failing to plan is planning to fail. Regular backups ensure that should the worst happen, you are prepared. Jetpack Backups has you covered."
 				noticeLink="https://jetpack.com/upgrade/backups"
