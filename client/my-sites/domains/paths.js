@@ -93,10 +93,6 @@ export function domainManagementRedirectSettings( siteName, domainName ) {
 	return domainManagementEdit( siteName, domainName, 'redirect-settings' );
 }
 
-export function domainManagementPrimaryDomain( siteName, domainName ) {
-	return domainManagementEdit( siteName, domainName, 'primary-domain' );
-}
-
 export function domainManagementTransfer( siteName, domainName, transferType = '' ) {
 	return domainManagementEdit(
 		siteName,

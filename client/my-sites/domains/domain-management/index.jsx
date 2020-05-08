@@ -10,7 +10,6 @@ import EditContactInfo from './edit-contact-info';
 import List from './list';
 import ManageConsent from './manage-consent';
 import NameServers from './name-servers';
-import PrimaryDomain from './primary-domain';
 import SiteRedirect from './site-redirect';
 import Transfer from './transfer';
 import TransferIn from './edit/transfer-in';
@@ -30,7 +29,6 @@ export default {
 	List,
 	ListAll,
 	NameServers,
-	PrimaryDomain,
 	SiteRedirect,
 	TransferIn,
 	TransferOut,

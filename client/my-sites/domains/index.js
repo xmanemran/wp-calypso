@@ -194,14 +194,6 @@ export default function () {
 		],
 	} );
 
-	page(
-		paths.domainManagementPrimaryDomain( ':site', ':domain' ),
-		...getCommonHandlers(),
-		domainManagementController.domainManagementPrimaryDomain,
-		makeLayout,
-		clientRender
-	);
-
 	if ( config.isEnabled( 'upgrades/domain-search' ) ) {
 		page(
 			'/domains/add',
