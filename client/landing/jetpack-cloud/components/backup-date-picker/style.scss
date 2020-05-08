@@ -96,7 +96,7 @@
 	fill: var( --studio-jetpack-green-40 );
 }
 
-@include breakpoint( '>660px' ) {
+@include breakpoint-deprecated( '>660px' ) {
 	.backup-date-picker {
 		background: transparent;
 	}
