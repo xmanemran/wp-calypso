@@ -24,7 +24,7 @@ function renderUpsell( props ) {
 			<Upsell
 				headerText={ translate( 'Your site does not have scan' ) }
 				bodyText={ translate(
-					'Scan does is currently not supported on WordPress Multi-site setups.'
+					'Scan is currently not supported on WordPress Multi-site setups.'
 				) }
 				buttonLink={ false }
 				iconComponent={ <SecurityIcon icon="info" /> }
